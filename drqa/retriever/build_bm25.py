@@ -203,6 +203,12 @@ if __name__ == '__main__':
         args, 'sqlite', {'db_path': args.db_path}
     )
 
+    filename_temp = os.path.join(args.out_dir, "csr-matrix-temp")
+    metadata_temp = {
+        'doc_dict': doc_dict
+    }
+    retriever.utils.save_sparse_csr(filename_temp, count_matrix, metadata_temp)
+
     logger.info('Making bm-25 vectors...')
     tfidf = get_bm_25_matrix(count_matrix)
 
