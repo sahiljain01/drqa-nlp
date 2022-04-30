@@ -155,11 +155,11 @@ def get_bm_25_matrix(cnts):
     idfs[idfs < 0] = 0
     idfs = sp.diags(idfs, 0)
 
-    tfs = np.zeros(cnts.shape)
+    tfs = cnts.astype('float')
     for r in range(0, cnts.shape[0]):
         for c in range(0, cnts.shape[1]):
             dl = doc_lens[c]
-            tfs[r, c] = cnts[r, c] / (cnts + k1 * (1 - b + (b * dl / adl)))
+            tfs[r, c] = tfs[r, c] / (tfs[r,c] + k1 * (1 - b + (b * dl / adl)))
     
     tfidfs = idfs.dot(tfs)
     return tfidfs
