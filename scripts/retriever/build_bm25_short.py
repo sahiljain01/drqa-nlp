@@ -215,7 +215,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     tfidf_path = 'data/wikipedia/csr-matrix-temp.npz'
-    count_matrix, metadata = utils.load_sparse_csr(tfidf_path)
+    count_matrix, metadata = retriever.utils.load_sparse_csr(tfidf_path)
 
     logger.info('Making bm-25 vectors [TEST]...')
     tfidf = get_tfidf_matrix(count_matrix)
