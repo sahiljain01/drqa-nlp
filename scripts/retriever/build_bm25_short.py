@@ -163,6 +163,8 @@ def get_bm_25_matrix(cnts):
     b = 0.75
     k1 = 1.2
 
+    print("Beginning idfs section")
+
     doc_lens = get_doc_lengths(cnts)
     adl = np.average(doc_lens)
 
@@ -171,12 +173,21 @@ def get_bm_25_matrix(cnts):
     idfs[idfs < 0] = 0
     idfs = sp.diags(idfs, 0)
 
-    tfs = cnts.astype('float')
-    for r in range(0, cnts.shape[0]):
-        for c in range(0, cnts.shape[1]):
-            dl = doc_lens[c]
-            tfs[r, c] = tfs[r, c] / (tfs[r,c] + k1 * (1 - b + (b * dl / adl)))
+    print("Beginning bm-25 transformation")
 
+    tfs = cnts.astype('float')
+    tfs = cnts.tolil()
+    tfs_2 = cnts.tocoo()
+
+    print("finished converting to lil, coo transformation")
+
+    for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
+        dl = doc_lens[j]
+        tfs[i, j] = tfs[i, j] / (tfs[i, j] + k1 * (1 - b + (b * dl / adl)))
+
+    print("ending bm-25 transformation")
+
+    tfs = tfs.tocsr()
     tfidfs = idfs.dot(tfs)
     return tfidfs
 
@@ -218,7 +229,7 @@ if __name__ == '__main__':
     count_matrix, metadata = retriever.utils.load_sparse_csr(tfidf_path)
 
     logger.info('Making bm-25 vectors [TEST]...')
-    tfidf = get_tfidf_matrix(count_matrix)
+    tfidf = get_bm_25_matrix(count_matrix)
 
     logger.info('Finished making bm-25 vectors [TEST]...')
     # logger.info('Getting word-doc frequencies...')
