@@ -180,16 +180,19 @@ def get_bm_25_matrix(cnts):
     tfs_2 = cnts.tocoo()
 
     print("finished converting to lil, coo transformation")
+    print(f"length of tfs_2 matrix: {len(tfs_2.row)}")
 
-    for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
-        dl = doc_lens[j]
-        tfs[i, j] = tfs[i, j] / (tfs[i, j] + k1 * (1 - b + (b * dl / adl)))
+    return
 
-    print("ending bm-25 transformation")
+    # for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
+    #     dl = doc_lens[j]
+    #     tfs[i, j] = tfs[i, j] / (tfs[i, j] + k1 * (1 - b + (b * dl / adl)))
 
-    tfs = tfs.tocsr()
-    tfidfs = idfs.dot(tfs)
-    return tfidfs
+    # print("ending bm-25 transformation")
+
+    # tfs = tfs.tocsr()
+    # tfidfs = idfs.dot(tfs)
+    # return tfidfs
 
 def get_doc_freqs(cnts):
     """Return word --> # of docs it appears in."""
