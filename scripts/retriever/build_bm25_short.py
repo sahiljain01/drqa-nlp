@@ -182,12 +182,15 @@ def get_bm_25_matrix(cnts):
     print("finished converting to lil, coo transformation")
     print(f"length of tfs_2 matrix: {len(tfs_2.row)}")
 
-    return
+    num_entries = 0
 
-    # for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
-    #     dl = doc_lens[j]
-    #     tfs[i, j] = tfs[i, j] / (tfs[i, j] + k1 * (1 - b + (b * dl / adl)))
+    for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
+        dl = doc_lens[j]
+        tfs[i, j] = v / (v + k1 * (1 - b + (b * dl / adl)))
 
+        if (num_entries % 50000 == 0):
+            logger.info(f'Processed {num_entries} entries. bm-25...')
+        num_entries += 1
     # print("ending bm-25 transformation")
 
     # tfs = tfs.tocsr()
