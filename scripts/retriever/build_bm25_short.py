@@ -235,9 +235,9 @@ def get_bm_25_matrix(cnts):
 
     for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
         dl = doc_lens[j]
-        row.add(i)
-        col.add(j)
-        data.add(v / (v + k1 * (1 - b + (b * dl / adl))))
+        row.append(i)
+        col.append(j)
+        data.append(v / (v + k1 * (1 - b + (b * dl / adl))))
 
         if (num_entries % 1000000 == 0):
             logger.info(f'Processed {num_entries} entries. bm-25...')
