@@ -125,6 +125,52 @@ def get_count_matrix(args, db, db_opts):
     count_matrix.sum_duplicates()
     return count_matrix, (DOC2IDX, doc_ids)
 
+class IncrementalCOOMatrix(object):
+
+    def __init__(self, shape, dtype):
+
+        if dtype is np.int32:
+            type_flag = 'i'
+        elif dtype is np.int64:
+            type_flag = 'l'
+        elif dtype is np.float32:
+            type_flag = 'f'
+        elif dtype is np.float64:
+            type_flag = 'd'
+        else:
+            raise Exception('Dtype not supported.')
+
+        self.dtype = dtype
+        self.shape = shape
+
+        self.rows = array.array('i')
+        self.cols = array.array('i')
+        self.data = array.array(type_flag)
+
+    def append(self, i, j, v):
+
+        m, n = self.shape
+
+        if (i >= m or j >= n):
+            raise Exception('Index out of bounds')
+
+        self.rows.append(i)
+        self.cols.append(j)
+        self.data.append(v)
+
+    def tocoo(self):
+
+        rows = np.frombuffer(self.rows, dtype=np.int32)
+        cols = np.frombuffer(self.cols, dtype=np.int32)
+        data = np.frombuffer(self.data, dtype=self.dtype)
+
+        return sp.coo_matrix((data, (rows, cols)),
+                             shape=self.shape)
+
+    def __len__(self):
+
+        return len(self.data)
+
 
 # ------------------------------------------------------------------------------
 # Transform count matrix to different forms.
@@ -175,27 +221,36 @@ def get_bm_25_matrix(cnts):
 
     print("Beginning bm-25 transformation")
 
-    tfs = cnts.astype('float')
-    tfs = cnts.tolil()
+    # tfs = cnts.astype('float')
+    # tfs = cnts.tolil()
     tfs_2 = cnts.tocoo()
 
     print("finished converting to lil, coo transformation")
     print(f"length of tfs_2 matrix: {len(tfs_2.row)}")
 
     num_entries = 0
+    row = []
+    col = []
+    data = []
 
     for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
         dl = doc_lens[j]
-        res = v / (v + k1 * (1 - b + (b * dl / adl)))
+        row.add(i)
+        col.add(j)
+        data.add(v / (v + k1 * (1 - b + (b * dl / adl))))
 
-        if (num_entries % 50000 == 0):
+        if (num_entries % 1000000 == 0):
             logger.info(f'Processed {num_entries} entries. bm-25...')
+            break
         num_entries += 1
-    # print("ending bm-25 transformation")
+
+    print("ending bm-25 transformation")
+    tfs = sp.csr_matrix((data, (row, col)), cnts.shape)
+    print("created new tfs sparse matrix")
 
     # tfs = tfs.tocsr()
-    # tfidfs = idfs.dot(tfs)
-    # return tfidfs
+    tfidfs = idfs.dot(tfs)
+    return tfidfs
 
 def get_doc_freqs(cnts):
     """Return word --> # of docs it appears in."""
@@ -240,3 +295,16 @@ if __name__ == '__main__':
     logger.info('Finished making bm-25 vectors [TEST]...')
     # logger.info('Getting word-doc frequencies...')
     # freqs = get_doc_freqs(count_matrix)
+    basename = os.path.splitext(os.path.basename(args.db_path))[0]
+    basename += ('-bm25-ngram=%d-hash=%d-tokenizer=%s' %
+                 (args.ngram, args.hash_size, args.tokenizer))
+    filename = os.path.join(args.out_dir, basename)
+    logger.info('Saving to %s.npz' % filename)
+    metadata = {
+        'doc_freqs': freqs,
+        'tokenizer': args.tokenizer,
+        'hash_size': args.hash_size,
+        'ngram': args.ngram,
+        'doc_dict': doc_dict
+    }
+    retriever.utils.save_sparse_csr(filename, tfidf, metadata)
