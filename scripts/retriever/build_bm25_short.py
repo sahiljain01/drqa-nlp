@@ -241,7 +241,6 @@ def get_bm_25_matrix(cnts):
 
         if (num_entries % 1000000 == 0):
             logger.info(f'Processed {num_entries} entries. bm-25...')
-            break
         num_entries += 1
 
     print("ending bm-25 transformation")
