@@ -287,10 +287,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     tfidf_path = 'data/wikipedia/csr-matrix-temp.npz'
-    count_matrix, metadata = retriever.utils.load_sparse_csr(tfidf_path)
+    count_matrix, metadata_loaded_csr = retriever.utils.load_sparse_csr(tfidf_path)
 
     logger.info('Making bm-25 vectors [TEST]...')
     tfidf = get_bm_25_matrix(count_matrix)
+
+    logger.info('Getting word-doc frequencies...')
+    freqs = get_doc_freqs(count_matrix)
 
     logger.info('Finished making bm-25 vectors [TEST]...')
     # logger.info('Getting word-doc frequencies...')
@@ -305,6 +308,6 @@ if __name__ == '__main__':
         'tokenizer': args.tokenizer,
         'hash_size': args.hash_size,
         'ngram': args.ngram,
-        'doc_dict': doc_dict
+        'doc_dict': metadata_loaded_csr['doc_dict']
     }
     retriever.utils.save_sparse_csr(filename, tfidf, metadata)
