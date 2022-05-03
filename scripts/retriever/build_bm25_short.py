@@ -231,21 +231,42 @@ def get_bm_25_matrix(cnts):
     doc_lens = (1.2 * 0.25) + ((0.9 / adl) * doc_lens)
 
     Ns = get_doc_freqs(cnts)
-    idfs = np.log((cnts.shape[1] - Ns + 0.5) / (Ns + 0.5))
+    idfs = np.log(((cnts.shape[1] - Ns + 0.5) / (Ns + 0.5)))
     idfs[idfs < 0] = 0
     idfs = sp.diags(idfs, 0)
 
     logger.info("Beginning bm-25 transformation")
     cnts = cnts.astype('float')
-    cnts2 = copy.deepcopy(cnts)
+    # cnts2 = copy.deepcopy(cnts)
+    cnts2 = cnts
     logger.info("beginning sum")
-    cnts2 = cnts2.transpose().tocsr()
-    sum(cnts2, doc_lens)
-    cnts2 = cnts2.transpose().tocsr()
-    logger.info("ending sum")
-    # tfs = cnts.tolil()
-    cnts2.data = 1 / cnts2.data
-    tfs = cnts.multiply(cnts2)
+    X = cnts2.transpose().tocsr()
+    # sum(cnts2, doc_lens)
+    # cnts2 = cnts2.transpose().tocsr()
+    # logger.info("ending sum")
+    # # tfs = cnts.tolil()
+    # cnts2.data = 1 / cnts2.data
+    # tfs = cnts.multiply(cnts2)
+
+    dl = X.sum(axis=1)
+    # Number of non-zero elements in each row
+    # Shape is (n_samples, )
+    sz = X.indptr[1:] - X.indptr[0:-1]
+    # In each row, repeat `dl` for `sz` times
+    # Shape is (sum(sz), )
+    # Example
+    # -------
+    # dl = [4, 5, 6]
+    # sz = [1, 2, 3]
+    # rep = [4, 5, 5, 6, 6, 6]
+    rep = np.repeat(np.asarray(dl), sz)
+    # Average document length
+    # Scalar value
+    avgdl = np.average(dl)
+    # Compute BM25 score only for non-zero elements
+    data = X.data * (self.k1 + 1) / (X.data + self.k1 * (1 - self.b + self.b * rep / avgdl))
+    X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
+    tfs = X.transpose().tocsr()
 
     logger.info("finished converting to lil, coo transformation")
     # tfs = tfs.tocsr()
@@ -299,7 +320,7 @@ if __name__ == '__main__':
     # logger.info('Getting word-doc frequencies...')
     # freqs = get_doc_freqs(count_matrix)
     basename = os.path.splitext(os.path.basename(args.db_path))[0]
-    basename += ('-bm25-ngram=%d-hash=%d-tokenizer=%s' %
+    basename += ('-bm25-new-ngram=%d-hash=%d-tokenizer=%s' %
                  (args.ngram, args.hash_size, args.tokenizer))
     filename = os.path.join(args.out_dir, basename)
     logger.info('Saving to %s.npz' % filename)
