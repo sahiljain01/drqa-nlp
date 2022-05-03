@@ -13,6 +13,7 @@ import argparse
 import os
 import math
 import logging
+import copy 
 
 from multiprocessing import Pool as ProcessPool
 from multiprocessing.util import Finalize
