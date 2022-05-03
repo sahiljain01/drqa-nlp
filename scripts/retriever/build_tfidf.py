@@ -178,10 +178,9 @@ if __name__ == '__main__':
                         help='Number of CPU processes (for tokenizing, etc)')
     args = parser.parse_args()
 
-    logging.info('Counting words...')
-    count_matrix, doc_dict = get_count_matrix(
-        args, 'sqlite', {'db_path': args.db_path}
-    )
+    tfidf_path = 'data/wikipedia/csr-matrix-temp.npz'
+    count_matrix, metadata_loaded_csr = retriever.utils.load_sparse_csr(tfidf_path)
+    doc_dict = metadata_loaded_csr['doc_dict']
 
     logger.info('Making tfidf vectors...')
     tfidf = get_tfidf_matrix(count_matrix)
@@ -190,7 +189,7 @@ if __name__ == '__main__':
     freqs = get_doc_freqs(count_matrix)
 
     basename = os.path.splitext(os.path.basename(args.db_path))[0]
-    basename += ('-tfidf-ngram=%d-hash=%d-tokenizer=%s' %
+    basename += ('-sahil-tfidf-ngram=%d-hash=%d-tokenizer=%s' %
                  (args.ngram, args.hash_size, args.tokenizer))
     filename = os.path.join(args.out_dir, basename)
 
