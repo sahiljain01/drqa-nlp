@@ -240,8 +240,8 @@ def get_bm_25_matrix(cnts):
     # cnts2 = copy.deepcopy(cnts)
     cnts2 = cnts
     logger.info("beginning sum")
-    X = cnts2.transpose().tocsr()
-    X = X.log1p()
+    # X = cnts2.transpose().tocsr()
+    tfs = np.cbrt(cnts2)
     # sum(cnts2, doc_lens)
     # cnts2 = cnts2.transpose().tocsr()
     # logger.info("ending sum")
@@ -266,9 +266,9 @@ def get_bm_25_matrix(cnts):
     # avgdl = np.average(dl)
     # Compute BM25 score only for non-zero elements
     # data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
-    data = X.data
-    X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
-    tfs = X.transpose().tocsr()
+    # data = X.data
+    # X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
+    # tfs = X.transpose().tocsr()
 
     logger.info("finished converting to lil, coo transformation")
     # tfs = tfs.tocsr()
