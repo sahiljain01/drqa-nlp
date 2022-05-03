@@ -106,7 +106,7 @@ class TfidfDocRanker(object):
         k1 = 1.2
         b = 0.75
         wids_unique, wids_counts = np.unique(wids, return_counts=True)
-        # tfs = np.log1p(wids_counts)
+        wids_counts = np.log1p(wids_counts)
 
         # dl = np.sum(wids_counts)
         # adl = 310.04
