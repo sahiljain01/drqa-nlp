@@ -196,6 +196,9 @@ def get_tfidf_matrix(cnts):
 
 def sum(X,v):
     rows, cols = X.shape
+    print(f"X shape: {X.shape}")
+    print(f"v shape: {v.shape}")
+    raise Exception("exception")
     row_start_stop = as_strided(X.indptr, shape=(rows, 2),
                             strides=2*X.indptr.strides)
     index = 0
