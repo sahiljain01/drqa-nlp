@@ -196,14 +196,11 @@ def get_tfidf_matrix(cnts):
 
 def sum(X,v):
     rows, cols = X.shape
-    print(f"X shape: {X.shape}")
-    print(f"v shape: {v.shape}")
-    raise Exception("exception")
     row_start_stop = as_strided(X.indptr, shape=(rows, 2),
                             strides=2*X.indptr.strides)
     index = 0
     for row, (start, stop) in enumerate(row_start_stop):
-        if index % 10000 == 0:
+        if index % 100000 == 0:
             logger.info(f"entries processed so far: {index}")
         data = X.data[start:stop]
         data += v[row]
@@ -242,7 +239,9 @@ def get_bm_25_matrix(cnts):
     cnts = cnts.astype('float')
     cnts2 = copy.deepcopy(cnts)
     logger.info("beginning sum")
+    cnts2 = cnts2.transpose().tocsr()
     sum(cnts2, doc_lens)
+    cnts2 = cnts2.transpose().tocsr()
     logger.info("ending sum")
     # tfs = cnts.tolil()
     cnts2.data = 1 / cnts2.data
