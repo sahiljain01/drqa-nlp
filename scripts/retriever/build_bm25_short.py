@@ -241,6 +241,7 @@ def get_bm_25_matrix(cnts):
     cnts2 = cnts
     logger.info("beginning sum")
     X = cnts2.transpose().tocsr()
+    X = X.log1p()
     # sum(cnts2, doc_lens)
     # cnts2 = cnts2.transpose().tocsr()
     # logger.info("ending sum")
