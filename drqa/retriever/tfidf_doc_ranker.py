@@ -93,6 +93,8 @@ class TfidfDocRanker(object):
         words = self.parse(utils.normalize(query))
         wids = [utils.hash(w, self.hash_size) for w in words]
 
+        # tf / (tf + (k1 * (1 - b + (b * (dl / adl))))
+
         if len(wids) == 0:
             if self.strict:
                 raise RuntimeError('No valid word in: %s' % query)
@@ -101,12 +103,17 @@ class TfidfDocRanker(object):
                 return sp.csr_matrix((1, self.hash_size))
 
         # Count TF
+        k1 = 1.2
+        b = 0.75
         wids_unique, wids_counts = np.unique(wids, return_counts=True)
-        tfs = np.log1p(wids_counts)
+        dl = np.sum(wids_counts)
+        adl = 310.04
+        tfs_denom = wids_counts + k1 * (0.25 + (0.75 * (dl / adl)))
+        tfs = wids_counts / tfs_denom
 
         # Count IDF
         Ns = self.doc_freqs[wids_unique]
-        idfs = np.log(((self.num_docs - Ns + 0.5) / (Ns + 0.5))+1)
+        idfs = np.log(((self.num_docs - Ns + 0.5) / (Ns + 0.5)))
         idfs[idfs < 0] = 0
 
         # TF-IDF
