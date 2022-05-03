@@ -236,11 +236,11 @@ def get_bm_25_matrix(cnts):
     idfs = sp.diags(idfs, 0)
 
     logger.info("Beginning bm-25 transformation")
+    cnts = cnts.astype('float')
     cnts2 = copy.deepcopy(cnts)
     logger.info("beginning sum")
     sum(cnts2, doc_lens)
     logger.info("ending sum")
-    # tfs = cnts.astype('float')
     # tfs = cnts.tolil()
     cnts2.data = 1 / cnts2.data
     tfs = cnts.multiply(cnts2)
