@@ -140,7 +140,7 @@ def get_tfidf_matrix(cnts):
     * Nt = number of occurences of term in all documents
     """
     Ns = get_doc_freqs(cnts)
-    idfs = np.log((cnts.shape[1] - Ns + 0.5) / (Ns + 0.5))
+    idfs = np.log(((cnts.shape[1] - Ns + 0.5) / (Ns + 0.5))+1)
     idfs[idfs < 0] = 0
     idfs = sp.diags(idfs, 0)
     tfs = cnts.log1p()
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     freqs = get_doc_freqs(count_matrix)
 
     basename = os.path.splitext(os.path.basename(args.db_path))[0]
-    basename += ('-sahil-tfidf-ngram=%d-hash=%d-tokenizer=%s' %
+    basename += ('-sahil-tfidf-plus-1-ngram=%d-hash=%d-tokenizer=%s' %
                  (args.ngram, args.hash_size, args.tokenizer))
     filename = os.path.join(args.out_dir, basename)
 
