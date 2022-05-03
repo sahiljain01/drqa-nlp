@@ -293,12 +293,24 @@ if __name__ == '__main__':
     count_matrix, metadata_loaded_csr = retriever.utils.load_sparse_csr(tfidf_path)
 
     logger.info('Making bm-25 vectors [TEST]...')
-    tfidf = get_bm_25_matrix(count_matrix)
+    bm_25_path = 'data/wikipedia/docs-bm25-ngram=2-hash=16777216-tokenizer=simple.npz'
+    bm25_matrix = retriever.utils.load_sparse_csr(bm_25_path)
+
+    print(f"matrix shape: {bm25_matrix.shape}")
+    print(f"number of non-zero entries: {bm25_matrix.count_nonzero()")
+
+    logger.info('Making bm-25 vectors [TEST]...')
+    tf_path = 'data/wikipedia/docs-sahil-tfidf-plus-1-ngram=2-hash=16777216-tokenizer=simple.npz'
+    tf_matrix = retriever.utils.load_sparse_csr(tf_path)
+
+    print(f"matrix shape: {tf_matrix.shape}")
+    print(f"number of non-zero entries: {tf_matrix.count_nonzero()")
+
 
     logger.info('Getting word-doc frequencies...')
-    freqs = get_doc_freqs(count_matrix)
+    # freqs = get_doc_freqs(count_matrix)
 
-    logger.info('Finished making bm-25 vectors [TEST]...')
+    # logger.info('Finished making bm-25 vectors [TEST]...')
     # logger.info('Getting word-doc frequencies...')
     # freqs = get_doc_freqs(count_matrix)
     # basename = os.path.splitext(os.path.basename(args.db_path))[0]
