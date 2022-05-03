@@ -106,7 +106,7 @@ class TfidfDocRanker(object):
 
         # Count IDF
         Ns = self.doc_freqs[wids_unique]
-        idfs = np.log((self.num_docs - Ns + 0.5) / (Ns + 0.5))
+        idfs = np.log(((self.num_docs - Ns + 0.5) / (Ns + 0.5))+1)
         idfs[idfs < 0] = 0
 
         # TF-IDF
