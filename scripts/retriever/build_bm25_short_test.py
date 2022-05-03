@@ -297,14 +297,14 @@ if __name__ == '__main__':
     bm25_matrix = retriever.utils.load_sparse_csr(bm_25_path)
 
     print(f"matrix shape: {bm25_matrix.shape}")
-    print(f"number of non-zero entries: {bm25_matrix.count_nonzero()")
+    print(f"number of non-zero entries: {bm25_matrix.count_nonzero()}")
 
     logger.info('Making bm-25 vectors [TEST]...')
     tf_path = 'data/wikipedia/docs-sahil-tfidf-plus-1-ngram=2-hash=16777216-tokenizer=simple.npz'
     tf_matrix = retriever.utils.load_sparse_csr(tf_path)
 
     print(f"matrix shape: {tf_matrix.shape}")
-    print(f"number of non-zero entries: {tf_matrix.count_nonzero()")
+    print(f"number of non-zero entries: {tf_matrix.count_nonzero()}")
 
 
     logger.info('Getting word-doc frequencies...')
