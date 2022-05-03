@@ -264,7 +264,7 @@ def get_bm_25_matrix(cnts):
     # Scalar value
     avgdl = np.average(dl)
     # Compute BM25 score only for non-zero elements
-    data = X.data * (self.k1 + 1) / (X.data + self.k1 * (1 - self.b + self.b * rep / avgdl))
+    data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
     X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
     tfs = X.transpose().tocsr()
 
