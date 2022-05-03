@@ -106,23 +106,28 @@ class TfidfDocRanker(object):
         k1 = 1.2
         b = 0.75
         wids_unique, wids_counts = np.unique(wids, return_counts=True)
+        tfs = np.log1p(wids_counts)
+
         # dl = np.sum(wids_counts)
         # adl = 310.04
         # tfs_denom = wids_counts + k1 * (0.25 + (0.75 * (dl / adl)))
         # tfs = wids_counts / tfs_denom
 
-        # # Count IDF
-        # Ns = self.doc_freqs[wids_unique]
-        # idfs = np.log(((self.num_docs - Ns + 0.5) / (Ns + 0.5)))
-        # idfs[idfs < 0] = 0
+        # Count IDF
+        Ns = self.doc_freqs[wids_unique]
+        idfs = np.log(((self.num_docs - Ns + 0.5) / (Ns + 0.5)))
+        idfs[idfs < 0] = 0
 
         # # TF-IDF
-        # data = np.multiply(tfs, idfs)
+        data = np.multiply(tfs, idfs)
 
         # One row, sparse csr matrix
         indptr = np.array([0, len(wids_unique)])
+        # spvec = sp.csr_matrix(
+        #     (wids_counts, wids_unique, indptr), shape=(1, self.hash_size)
+        # )
         spvec = sp.csr_matrix(
-            (wids_counts, wids_unique, indptr), shape=(1, self.hash_size)
+            (data, wids_unique, indptr), shape=(1, self.hash_size)
         )
 
         return spvec
