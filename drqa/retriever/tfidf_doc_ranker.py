@@ -122,7 +122,7 @@ class TfidfDocRanker(object):
         data = np.multiply(tfs, idfs)
 
         # One row, sparse csr matrix
-        # indptr = np.array([0, len(wids_unique)])
+        indptr = np.array([0, len(wids_unique)])
         # spvec = sp.csr_matrix(
         #     (wids_counts, wids_unique, indptr), shape=(1, self.hash_size)
         # )
