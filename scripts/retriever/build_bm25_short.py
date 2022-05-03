@@ -221,7 +221,7 @@ def get_bm_25_matrix(cnts):
     * Nt = number of occurences of term in all documents
     """
     b = 0.75
-    k1 = 1.2
+    k1 = 5
 
     logger.info("Beginning idfs section")
 
@@ -320,7 +320,7 @@ if __name__ == '__main__':
     # logger.info('Getting word-doc frequencies...')
     # freqs = get_doc_freqs(count_matrix)
     basename = os.path.splitext(os.path.basename(args.db_path))[0]
-    basename += ('-bm25-new-ngram=%d-hash=%d-tokenizer=%s' %
+    basename += ('-bm25-high-k-ngram=%d-hash=%d-tokenizer=%s' %
                  (args.ngram, args.hash_size, args.tokenizer))
     filename = os.path.join(args.out_dir, basename)
     logger.info('Saving to %s.npz' % filename)
