@@ -245,9 +245,6 @@ def get_bm_25_matrix(cnts):
     tfs = cnts.multiply(cnts2)
 
     logger.info("finished converting to lil, coo transformation")
-    logger.info(f"length of tfs_2 matrix: {len(tfs_2.row)}")
-
-
     # tfs = tfs.tocsr()
     tfidfs = idfs.dot(tfs)
     return tfidfs
