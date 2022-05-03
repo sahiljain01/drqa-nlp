@@ -248,10 +248,10 @@ def get_bm_25_matrix(cnts):
     # cnts2.data = 1 / cnts2.data
     # tfs = cnts.multiply(cnts2)
 
-    dl = X.sum(axis=1)
+    # dl = X.sum(axis=1)
     # Number of non-zero elements in each row
     # Shape is (n_samples, )
-    sz = X.indptr[1:] - X.indptr[0:-1]
+    # sz = X.indptr[1:] - X.indptr[0:-1]
     # In each row, repeat `dl` for `sz` times
     # Shape is (sum(sz), )
     # Example
@@ -259,12 +259,13 @@ def get_bm_25_matrix(cnts):
     # dl = [4, 5, 6]
     # sz = [1, 2, 3]
     # rep = [4, 5, 5, 6, 6, 6]
-    rep = np.repeat(np.asarray(dl), sz)
+    # rep = np.repeat(np.asarray(dl), sz)
     # Average document length
     # Scalar value
-    avgdl = np.average(dl)
+    # avgdl = np.average(dl)
     # Compute BM25 score only for non-zero elements
-    data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
+    # data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
+    data = X.data
     X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
     tfs = X.transpose().tocsr()
 
@@ -320,7 +321,7 @@ if __name__ == '__main__':
     # logger.info('Getting word-doc frequencies...')
     # freqs = get_doc_freqs(count_matrix)
     basename = os.path.splitext(os.path.basename(args.db_path))[0]
-    basename += ('-bm25-high-k-ngram=%d-hash=%d-tokenizer=%s' %
+    basename += ('test-bm25-high-k-ngram=%d-hash=%d-tokenizer=%s' %
                  (args.ngram, args.hash_size, args.tokenizer))
     filename = os.path.join(args.out_dir, basename)
     logger.info('Saving to %s.npz' % filename)
