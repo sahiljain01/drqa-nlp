@@ -8,6 +8,7 @@
 
 import numpy as np
 import scipy.sparse as sp
+from numpy.lib.stride_tricks import as_strided
 import argparse
 import os
 import math
@@ -192,6 +193,18 @@ def get_tfidf_matrix(cnts):
     tfidfs = idfs.dot(tfs)
     return tfidfs
 
+def sum(X,v):
+    rows, cols = X.shape
+    row_start_stop = as_strided(X.indptr, shape=(rows, 2),
+                            strides=2*X.indptr.strides)
+    index = 0
+    for row, (start, stop) in enumerate(row_start_stop):
+        if index % 10000 == 0:
+            logger.info(f"entries processed so far: {index}")
+        data = X.data[start:stop]
+        data += v[row]
+        index = index + 1
+
 
 def get_bm_25_matrix(cnts):
     """Convert the word count matrix into bm-25 one.
@@ -209,43 +222,31 @@ def get_bm_25_matrix(cnts):
     b = 0.75
     k1 = 1.2
 
-    print("Beginning idfs section")
+    logger.info("Beginning idfs section")
 
     doc_lens = get_doc_lengths(cnts)
     adl = np.average(doc_lens)
+
+    doc_lens = (1.2 * 0.25) + ((0.9 / adl) * doc_lens)
 
     Ns = get_doc_freqs(cnts)
     idfs = np.log((cnts.shape[1] - Ns + 0.5) / (Ns + 0.5))
     idfs[idfs < 0] = 0
     idfs = sp.diags(idfs, 0)
 
-    print("Beginning bm-25 transformation")
-
+    logger.info("Beginning bm-25 transformation")
+    cnts2 = copy.deepcopy(cnts)
+    logger.info("beginning sum")
+    sum(cnts2, doc_lens)
+    logger.info("ending sum")
     # tfs = cnts.astype('float')
     # tfs = cnts.tolil()
-    tfs_2 = cnts.tocoo()
+    cnts2.data = 1 / cnts2.data
+    tfs = cnts.multiply(cnts2)
 
-    print("finished converting to lil, coo transformation")
-    print(f"length of tfs_2 matrix: {len(tfs_2.row)}")
+    logger.info("finished converting to lil, coo transformation")
+    logger.info(f"length of tfs_2 matrix: {len(tfs_2.row)}")
 
-    num_entries = 0
-    row = []
-    col = []
-    data = []
-
-    for i,j,v in zip(tfs_2.row, tfs_2.col, tfs_2.data):
-        dl = doc_lens[j]
-        row.append(i)
-        col.append(j)
-        data.append(v / (v + k1 * (1 - b + (b * dl / adl))))
-
-        if (num_entries % 1000000 == 0):
-            logger.info(f'Processed {num_entries} entries. bm-25...')
-        num_entries += 1
-
-    print("ending bm-25 transformation")
-    tfs = sp.csr_matrix((data, (row, col)), cnts.shape)
-    print("created new tfs sparse matrix")
 
     # tfs = tfs.tocsr()
     tfidfs = idfs.dot(tfs)
