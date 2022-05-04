@@ -221,7 +221,7 @@ def get_bm_25_matrix(cnts):
     * Nt = number of occurences of term in all documents
     """
     b = 0.75
-    k1 = 5
+    k1 = 1.2
 
     logger.info("Beginning idfs section")
 
@@ -241,7 +241,7 @@ def get_bm_25_matrix(cnts):
     cnts2 = cnts
     logger.info("beginning sum")
     # X = cnts2.transpose().tocsr()
-    tfs = cnts.sqrt()
+    tfs = cnts.log1p()
     # sum(cnts2, doc_lens)
     # cnts2 = cnts2.transpose().tocsr()
     # logger.info("ending sum")
@@ -265,6 +265,7 @@ def get_bm_25_matrix(cnts):
     # Scalar value
     # avgdl = np.average(dl)
     # Compute BM25 score only for non-zero elements
+    tfs = tfs.data * (k1 + 1) / (tfs.data + k1)
     # data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
     # data = X.data
     # X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
