@@ -229,7 +229,7 @@ def get_bm_25_matrix(cnts):
     adl = np.average(doc_lens)
     logger.info(f"Average document length: {adl}")
     logger.info(f"Average std: {np.std(doc_lens)}")
-    logger.info(f"number of docs: {doc_lens.shape)}")
+    logger.info(f"number of docs: {doc_lens.shape}")
 
     return 
 
