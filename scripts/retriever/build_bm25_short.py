@@ -227,6 +227,11 @@ def get_bm_25_matrix(cnts):
 
     doc_lens = get_doc_lengths(cnts)
     adl = np.average(doc_lens)
+    logger.info(f"Average document length: {adl}")
+    logger.info(f"Average std: {np.std(doc_lens)}")
+    logger.info(f"number of docs: {doc_lens.shape)}")
+
+    return 
 
     doc_lens = (1.2 * 0.25) + ((0.9 / adl) * doc_lens)
 
@@ -265,7 +270,7 @@ def get_bm_25_matrix(cnts):
     # Scalar value
     # avgdl = np.average(dl)
     # Compute BM25 score only for non-zero elements
-    tfs = np.multiply(tfs.data * (k1 + 1), 1 / (tfs.data + k1))
+    tfs = (tfs.data * (k1 + 1), 1 / (tfs.data + k1))
     # data = X.data * (k1 + 1) / (X.data + k1 * (1 - b + b * rep / avgdl))
     # data = X.data
     # X = sp.csr_matrix((data, X.indices, X.indptr), shape=X.shape)
